@@ -148,11 +148,20 @@ class GameBoard{
         for(let row = 0; row < this.fieldSizeY; row++){
             for(let col = 0; col < this.fieldSizeX; col++){
                 let ps = this.field[row][col].toString()
-                if (row == this.cursor_row && col == 0) {
-                    ps = ">"
-                } else if(row == 0 && col == this.cursor_col){
-                    ps = "v"
-                } else if(row == this.cursor_row && col == this.cursor_col){
+                if (row == this.cursor_row) {
+                    if (col == 0) {
+                        ps = ">"
+                    } else if (col == this.fieldSizeX - 1) {
+                        ps = "<"
+                    }
+                } else if(col == this.cursor_col){
+                    if(row == 0) {
+                        ps = "v"
+                    } else if (row == this.fieldSizeY - 1) {
+                        ps = "^"
+                    }
+                } 
+                if(row == this.cursor_row && col == this.cursor_col){
                     if(ps == "#"){
                         ps = "@"
                     } else {
