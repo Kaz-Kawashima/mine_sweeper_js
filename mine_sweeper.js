@@ -100,7 +100,7 @@ class GameBoard{
             for(let row = 1; row <= this.sizeY; row++){
                 for(let col = 1; col <= this.sizeX; col++){
                     let p = this.field[row][col]
-                    if (p.is_open && p.bomb_value == 0){
+                    if (p.is_open && p.bomb_value === 0){
                         new_open += this.openAround(row, col)
                     }
                 }
@@ -148,21 +148,21 @@ class GameBoard{
         for(let row = 0; row < this.fieldSizeY; row++){
             for(let col = 0; col < this.fieldSizeX; col++){
                 let ps = this.field[row][col].toString()
-                if (row == this.cursor_row) {
-                    if (col == 0) {
+                if (row === this.cursor_row) {
+                    if (col === 0) {
                         ps = ">"
-                    } else if (col == this.fieldSizeX - 1) {
+                    } else if (col === this.fieldSizeX - 1) {
                         ps = "<"
                     }
-                } else if(col == this.cursor_col){
-                    if(row == 0) {
+                } else if(col === this.cursor_col){
+                    if(row === 0) {
                         ps = "v"
-                    } else if (row == this.fieldSizeY - 1) {
+                    } else if (row === this.fieldSizeY - 1) {
                         ps = "^"
                     }
                 } 
-                if(row == this.cursor_row && col == this.cursor_col){
-                    if(ps == "#"){
+                if(row === this.cursor_row && col === this.cursor_col){
+                    if(ps === "#"){
                         ps = "@"
                     } else {
                         ps = "_"
@@ -232,7 +232,7 @@ document.addEventListener('keydown', function(event) {
         gb.arrowLeft()
     } else if (key === 'ArrowRight') {
         gb.arrowRight()
-    } else if (key == "o" || key == "O") {
+    } else if (key === "o" || key === "O") {
         let ret = gb.open()
         if (ret) {
             gb.cascadeOpen()
@@ -246,7 +246,7 @@ document.addEventListener('keydown', function(event) {
             alert("Game Over!")
             gb.init()
         }       
-    } else if (key == "f" || key == "F") {
+    } else if (key === "f" || key === "F") {
         gb.flag()
     }
     div.innerText = gb.toString()
