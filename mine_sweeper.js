@@ -1,5 +1,12 @@
 import {BlankPanel, BombPanel, BorderPanel} from "./panel.js"
 
+const GameStatus = Object.freeze({
+    Uninitialized: "Uninitialized",
+    Playing: "Playing",
+    Win: "Win",
+    Lose: "Lose"
+})
+
 class GameBoard{
     constructor(y, x, numBomb){
         this.sizeY = y
@@ -24,38 +31,59 @@ class GameBoard{
             this.field[0][col] = new BorderPanel()
             this.field[this.fieldSizeY - 1][col] = new BorderPanel()
         }
-        //Set Bomb
-        this.setBomb(numBomb)
-        //Calc Bomb Num
-        this.calcBombNumGb()
+        this.status = GameStatus.Uninitialized
         this.cursor_row = 1;
         this.cursor_col = 1;
     }
+
     init(){
         for(let row = 1; row <= this.sizeY; row++){
             for(let col = 1; col <= this.sizeX; col++){
                 this.field[row][col] = new BlankPanel()
             }
         }
-        //Set Bomb
-        this.setBomb(this.numBomb)
-        //Calc Bomb Num
-        this.calcBombNumGb()
+        this.status = GameStatus.Uninitialized
         this.cursor_row = 1;
         this.cursor_col = 1;       
     }
 
-    setBomb(num_bomb) {
+    UpdateStatus() {
+        if(this.status == GameStatus.Uninitialized){
+            return
+        }
+        this.status = GameStatus.Win
+        for(let row = 1; row <= this.sizeY; row++) {
+            for(let col = 1; col <= this.sizeX; col++){
+                let p = this.field[row][col]
+                if ((p instanceof BlankPanel) && !p.is_open){
+                    this.status = GameStatus.Playing
+                }
+                if ((p instanceof BombPanel) && p.is_open){
+                    this.status = GameStatus.Lose
+                    return
+                }
+            }
+        }
+        return
+    }
+
+    setBomb() {
         let counter = 0
-        while(counter < num_bomb){
+        while(counter < this.numBomb){
             let row = Math.floor(Math.random() * this.sizeY) + 1
             let col = Math.floor(Math.random() * this.sizeX) + 1
+            if (row == this.cursor_row && col == this.cursor_col){
+                continue
+            }
             if (!(this.field[row][col] instanceof BombPanel)){
                 this.field[row][col] = new BombPanel()
                 counter++
             }
         }
+        this.calcBombNumGb()
+        this.status = GameStatus.Playing
     }
+
     calcBombNumGb(){
         for(let row = 1; row <= this.sizeY; row++) {
             for(let col = 1; col <= this.sizeX; col++){
@@ -66,7 +94,7 @@ class GameBoard{
             }
         }
     }
-    
+
     calcBombNum(y, x){
         let counter = 0
         for(let row = y - 1; row <= y + 1; row++){
@@ -84,7 +112,8 @@ class GameBoard{
         let count = 0
         for(let row = y - 1; row <= y + 1; row++){
             for(let col = x - 1; col <= x + 1; col++){
-                if(!this.field[row][col].is_open){
+                let p = this.field[row][col]
+                if(!p.is_open && !p.is_flagged){
                     this.field[row][col].open()
                     count++
                 }
@@ -208,7 +237,14 @@ class GameBoard{
     }
 
     open() {
-        return this.field[this.cursor_row][this.cursor_col].open()
+        if (this.status == GameStatus.Uninitialized){
+            this.setBomb()
+        }
+        let is_safe = this.field[this.cursor_row][this.cursor_col].open()
+        if(is_safe){
+            this.cascadeOpen()
+        }
+        this.UpdateStatus()
     }
 
     flag() {
@@ -233,18 +269,18 @@ document.addEventListener('keydown', function(event) {
     } else if (key === 'ArrowRight') {
         gb.arrowRight()
     } else if (key === "o" || key === "O") {
-        let ret = gb.open()
-        if (ret) {
-            gb.cascadeOpen()
-            if(gb.isFinished()){
+        gb.open()
+        switch(gb.status)
+        {
+            case GameStatus.Win:
                 alert("You Win!")
-                gb.init()               
-            }
-        } else {
-            gb.bombOpen()
-            div.innerText = gb.toString()          
-            alert("Game Over!")
-            gb.init()
+                gb.init()
+                break
+            case GameStatus.Lose:
+                gb.bombOpen()
+                div.innerText = gb.toString()          
+                alert("Game Over!")
+                gb.init()
         }       
     } else if (key === "f" || key === "F") {
         gb.flag()

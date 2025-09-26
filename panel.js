@@ -11,7 +11,7 @@ export class Panel {
 export class BlankPanel extends Panel {
     constructor(){
         super()
-        this.bomb_value = 0
+        this.bomb_value = -1
     }
     open(){
         if (this.is_flagged) {
