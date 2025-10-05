@@ -38,8 +38,9 @@ export class BlankPanel extends Panel {
 }
 
 export class BombPanel extends Panel {
-    constructor(){
+    constructor(flag = false){
         super()
+        this.is_flagged = flag
     }
     open() {
         if (this.is_flagged) {

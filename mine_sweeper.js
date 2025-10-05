@@ -76,7 +76,9 @@ class GameBoard{
                 continue
             }
             if (!(this.field[row][col] instanceof BombPanel)){
-                this.field[row][col] = new BombPanel()
+                // Keep flag state
+                let flag = this.field[row][col].is_flagged
+                this.field[row][col] = new BombPanel(flag)
                 counter++
             }
         }
